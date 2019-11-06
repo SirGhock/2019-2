@@ -4,7 +4,12 @@ import com.example.app.negocio.excecao.NomeMenorCincoCaracteresException;
 import com.example.app.negocio.excecao.PaisNaoDefinidoException;
 import com.example.app.negocio.validador.FabricaValidadorTelefone;
 import com.example.app.negocio.validador.TelefoneNaoCorrespondePaisException;
+import com.example.app.persistencia.Cliente;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,9 +18,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
 public class ClienteDTO {
+
     
-    private int id;
+    private Long id;
 
     @EqualsAndHashCode.Include
     private String nome;
@@ -38,6 +45,37 @@ public class ClienteDTO {
         }
     }
 
+        public static ClienteDTO DTOFromEntity(Cliente cliente) {
+        return ClienteDTO.builder()
+                .id(cliente.getId())
+                .nome(cliente.getNome())
+                .idade(cliente.getIdade())
+                .telefone(cliente.getTelefone())
+                .limiteCredito(cliente.getLimiteCredito())
+                .pais(PaisDTO.DTOFromEntity(cliente.getPais()))
+                .build();
+    }
+        
+        public static Set<ClienteDTO> DTOsFromEntities(List<Cliente> clientes) {
+        var resultado = new HashSet<ClienteDTO>();
+
+        for (Cliente clienteAtual : clientes) 
+            resultado.add(ClienteDTO.DTOFromEntity(clienteAtual));
+
+        return resultado;
+    }
+        
+        public static Cliente EntityFromDTO (ClienteDTO cliente) {
+        return Cliente.builder()
+                .id(cliente.getId())
+                .nome(cliente.getNome())
+                .idade(cliente.getIdade())
+                .telefone(cliente.getTelefone())
+                .limiteCredito(cliente.getLimiteCredito())
+                .pais(PaisDTO.EntityFromDTO(cliente.getPais()))
+               .build();
+    }   
+    
     public void setLimiteCredito(double limiteCredito) {
         throw new UnsupportedOperationException("Não é possível alterar o limite de crédito diretamente");
     }
